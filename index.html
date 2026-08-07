@@ -19,14 +19,14 @@
     <div class="max-w-4xl mx-auto bg-white p-6 rounded-xl shadow-lg border-t-4 border-sky-500">
         <h2 class="text-2xl font-bold mb-6 text-sky-600 text-center">Registro de Amarres por Obra o Proyecto</h2>
 
-        <form id="amarreForm">
+        <div id="amarreForm">
             <!-- Datos Fijos -->
             <div class="bg-sky-50 p-4 rounded-lg mb-6 border border-sky-100">
                 <h3 class="font-bold text-sky-800 mb-3 text-xs uppercase tracking-wide border-b border-sky-200 pb-1">Información Técnica Fija</h3>
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
                     <div class="md:col-span-2 bg-yellow-100 p-2 rounded border border-yellow-300">
                         <label class="block text-[11px] font-extrabold text-yellow-900">Obra / Proyecto (Filtro)</label>
-                        <input type="text" id="transformador" placeholder="Ej: Obra La Candelaria o Código" required class="w-full border p-1 rounded text-xs bg-white text-gray-900 font-bold" oninput="renderizar()" list="listaObras">
+                        <input type="text" id="transformador" placeholder="Ej: Obra La Candelaria o Código" class="w-full border p-1 rounded text-xs bg-white text-gray-900 font-bold" oninput="renderizar()" list="listaObras">
                         <datalist id="listaObras"></datalist>
                     </div>
                     <div><label class="block text-[10px] font-bold text-sky-900">Departamento</label><input type="text" id="departamento" value="Bolívar" class="w-full border p-1 rounded text-xs bg-white text-gray-900"></div>
@@ -64,10 +64,10 @@
                 </div>
             </div>
 
-            <button type="submit" class="w-full bg-indigo-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-indigo-700 transition-colors shadow-md mb-4">
+            <button type="button" onclick="guardarRegistro()" class="w-full bg-indigo-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-indigo-700 transition-colors shadow-md mb-4">
                 Guardar Registro
             </button>
-        </form>
+        </div>
 
         <!-- SECCIÓN DE REGISTROS CON SCROLL INDEPENDIENTE -->
         <div class="border-t pt-4 mt-6">
@@ -157,8 +157,7 @@
             input.value = input.value.replace(/[^0-9]/g, '');
         }
 
-        document.getElementById('amarreForm').addEventListener('submit', function(e) {
-            e.preventDefault();
+        function guardarRegistro() {
             const trafo = document.getElementById('transformador').value.trim();
             if(!trafo) {
                 alert("Por favor, ingresa la Obra o Proyecto.");
@@ -193,14 +192,13 @@
             localStorage.setItem('amarres_data', JSON.stringify(amarres));
             renderizar();
             
-            // LIMPIEZA EXCLUSIVA: Únicamente se limpian los campos del bloque inferior de Usuario. 
-            // Los campos técnicos fijos (Obra, Barrio, Matrícula MT, MAC, etc.) NO se tocan para que puedas seguir usándolos.
+            // Limpieza estrictamente limitada a los datos del cliente, preservando la información fija intacta
             const camposUsuario = ['serieMedidor', 'nic', 'nis', 'nombreCliente', 'direccionCliente', 'obs'];
             camposUsuario.forEach(c => {
                 const el = document.getElementById(c);
                 if(el) el.value = '';
             });
-        });
+        }
 
         function renderizar() {
             const obraActual = document.getElementById('transformador').value.trim().toLowerCase();
