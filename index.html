@@ -193,7 +193,8 @@
             localStorage.setItem('amarres_data', JSON.stringify(amarres));
             renderizar();
             
-            ['serieMedidor','nic','nis','nombreCliente','direccionCliente','obs','mac','barrio','matriculaMT'].forEach(c => {
+            // Limpieza de campos específicos de usuario y datos técnicos variables por registro
+            ['barrio', 'matriculaMT', 'mac', 'serieMedidor', 'nic', 'nis', 'nombreCliente', 'direccionCliente', 'obs'].forEach(c => {
                 const el = document.getElementById(c);
                 if(el) el.value = '';
             });
@@ -392,7 +393,30 @@
 
             if (filtrados.length === 0) { alert("No hay registros para esta selección."); return; }
 
-            const datosExportar = filtrados.map((item, idx) => ({ "#": idx + 1, ...item }));
+            const datosExportar = filtrados.map((item, idx) => ({
+                "#": idx + 1,
+                "Obra / Proyecto": item.transformador || '',
+                "Departamento": item.departamento || document.getElementById('departamento').value,
+                "Ciudad": item.ciudad || document.getElementById('ciudad').value,
+                "Barrio": item.barrio || '',
+                "Delegación": item.delegacion || document.getElementById('delegacion').value,
+                "Tipo Proyecto": item.tipoProyecto || document.getElementById('tipoProyecto').value,
+                "Matrícula MT": item.matriculaMT || '',
+                "TP": item.tp || '',
+                "MAC": item.mac || '',
+                "TC": item.tc || '',
+                "Tipo Punto Medida": item.tipoPuntoMedida || '',
+                "Tipo Actividad": item.tipoActividad || '',
+                "Serie Medidor": item.serieMedidor || '',
+                "Tipo Medidor": item.tipoMedidor || '',
+                "Marca": item.marcaMedidor || '',
+                "NIC": item.nic || '',
+                "NIS": item.nis || '',
+                "Nombre Cliente": item.nombreCliente || '',
+                "Dirección": item.direccionCliente || '',
+                "OBS": item.obs || ''
+            }));
+
             const worksheet = XLSX.utils.json_to_sheet(datosExportar);
             const workbook = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(workbook, worksheet, "Amarres");
