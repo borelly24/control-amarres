@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Amarres - Pro</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        .modal-bg { background-color: rgba(0, 0, 0, 0.5); }
+    </style>
+</head>
+<body class="bg-gray-50 p-4">
+
+    <div class="max-w-4xl mx-auto bg-white p-6 rounded-xl shadow-lg border-t-4 border-sky-500">
+        <h2 class="text-2xl font-bold mb-6 text-sky-600 text-center">Registro de Amarres por Obra o Proyecto</h2>
+
+        <form id="amarreForm">
+            <!-- Datos Fijos -->
+            <div class="bg-sky-50 p-4 rounded-lg mb-6 border border-sky-100">
+                <h3 class="font-bold text-sky-800 mb-3 text-xs uppercase tracking-wide border-b border-sky-200 pb-1">Información Técnica Fija</h3>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+                    <div class="md:col-span-2 bg-yellow-100 p-2 rounded border border-yellow-300">
+                        <label class="block text-[11px] font-extrabold text-yellow-900">Obra / Proyecto (Filtro)</label>
+                        <input type="text" id="transformador" placeholder="Ej: Obra La Candelaria o Código" required class="w-full border p-1 rounded text-xs bg-white text-gray-900 font-bold" oninput="renderizar()" list="listaObras">
+<datalist id="listaObras"></datalist>
+                    </div>
+                    <div><label class="block text-[10px] font-bold text-sky-900">Departamento</label><input type="text" id="departamento" value="Bolívar" class="w-full border p-1 rounded text-xs bg-white text-gray-900"></div>
+                    <div><label class="block text-[10px] font-bold text-sky-900">Ciudad</label><input type="text" id="ciudad" value="Magangué" class="w-full border p-1 rounded text-xs bg-white text-gray-900"></div>
+                    <div><label class="block text-[10px] font-bold text-sky-900">Barrio</label><input type="text" id="barrio" class="w-full border p-1 rounded text-xs bg-white text-gray-900"></div>
+                    <div><label class="block text-[10px] font-bold text-sky-900">Delegación</label><input type="text" id="delegacion" value="Bolívar Sur" class="w-full border p-1 rounded text-xs bg-white text-gray-900"></div>
+                    <div><label class="block text-[10px] font-bold text-sky-900">Tipo Proyecto</label><input type="text" id="tipoProyecto" value="Red TD" class="w-full border p-1 rounded text-xs bg-white text-gray-900"></div>
+                    <div><label class="block text-[10px] font-bold text-sky-900">Matrícula MT (Instalada Nueva)</label><input type="text" id="matriculaMT" placeholder="Ej: MT-Nueva-01" class="w-full border p-1 rounded text-xs bg-white text-gray-900 font-bold"></div>
+                    <div><label class="block text-[10px] font-bold text-sky-900">TP</label><input type="text" id="tp" value="TP 01" class="w-full border p-1 rounded text-xs bg-white text-gray-900"></div>
+                    <div><label class="block text-[10px] font-bold text-sky-900">MAC</label><input type="text" id="mac" inputmode="numeric" pattern="[0-9]*" class="w-full border p-1 rounded text-xs bg-white text-gray-900"></div>
+                    <div><label class="block text-[10px] font-bold text-sky-900">TC</label><input type="text" id="tc" value="300/5" class="w-full border p-1 rounded text-xs bg-white text-gray-900"></div>
+                    <div><label class="block text-[10px] font-bold text-sky-900">Tipo Punto Medida</label><input type="text" id="tipoPuntoMedida" value="Usuario" class="w-full border p-1 rounded text-xs bg-white text-gray-900"></div>
+                    <div><label class="block text-[10px] font-bold text-sky-900">Tipo Actividad</label><input type="text" id="tipoActividad" value="Residencial" class="w-full border p-1 rounded text-xs bg-white text-gray-900"></div>
+                </div>
+            </div>
+
+            <!-- Datos Usuario -->
+            <div class="bg-gray-50 p-4 rounded-lg mb-6 border border-gray-200">
+                <h3 class="font-bold text-gray-600 mb-3 text-xs uppercase tracking-wide border-b border-gray-200 pb-1">Datos del Usuario</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div><label class="block text-xs font-semibold">Serie Medidor</label><input type="text" id="serieMedidor" inputmode="numeric" pattern="[0-9]*" oninput="soloNumeros(this)" class="w-full border p-2 rounded bg-white text-gray-900"></div>
+                    <div><label class="block text-xs font-semibold">Tipo Medidor</label>
+                        <select id="tipoMedidor" class="w-full border p-2 rounded bg-white text-gray-900">
+                            <option>Monofasico Bifilar 1F2H</option>
+                            <option>Monofasico Trifilar 1F3H</option>
+                            <option>Bifasico 2F3H</option>
+                        </select>
+                    </div>
+                    <div><label class="block text-xs font-semibold">Marca</label><input type="text" id="marcaMedidor" value="Hexing" class="w-full border p-2 rounded bg-white text-gray-900"></div>
+                    <div><label class="block text-xs font-semibold">NIC</label><input type="text" id="nic" inputmode="numeric" pattern="[0-9]*" oninput="soloNumeros(this)" class="w-full border p-2 rounded bg-white text-gray-900"></div>
+                    <div><label class="block text-xs font-semibold">NIS</label><input type="text" id="nis" inputmode="numeric" pattern="[0-9]*" oninput="soloNumeros(this)" class="w-full border p-2 rounded bg-white text-gray-900"></div>
+                    <div><label class="block text-xs font-semibold">Nombre Cliente</label><input type="text" id="nombreCliente" class="w-full border p-2 rounded bg-white text-gray-900"></div>
+                    <div><label class="block text-xs font-semibold">Dirección</label><input type="text" id="direccionCliente" class="w-full border p-2 rounded bg-white text-gray-900"></div>
+                    <div><label class="block text-xs font-semibold">OBS</label><input type="text" id="obs" inputmode="numeric" pattern="[0-9]*" oninput="soloNumeros(this)" class="w-full border p-2 rounded bg-white text-gray-900"></div>
+                </div>
+            </div>
+
+            <button type="submit" class="w-full bg-indigo-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-indigo-700 transition-colors shadow-md mb-4">
+                Guardar Registro
+            </button>
+        </form>
+
+        <!-- SECCIÓN DE REGISTROS CON SCROLL INDEPENDIENTE -->
+        <div class="border-t pt-4 mt-6">
+            <h3 class="text-lg font-bold mb-4">Registros de la Obra: <span id="contador" class="text-sky-600">0</span></h3>
+            
+            <div class="overflow-y-auto border border-gray-200 rounded-lg p-2 bg-gray-50" style="max-height: 250px;">
+                <table class="w-full text-sm border-collapse" id="tablaAmarres"></table>
+            </div>
+            
+            <button onclick="prepararExportacion()" class="mt-4 w-full bg-green-600 text-white py-3 rounded-lg font-bold hover:bg-green-700 shadow">Descargar Excel (Obra Actual)</button>
+            
+            <button onclick="prepararModalEliminacion()" class="mt-2 w-full bg-red-100 text-red-600 py-2.5 rounded-lg font-bold hover:bg-red-200 border border-red-200 transition-colors text-xs shadow-sm">
+                🗑️ Opciones de Borrado...
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal de Modificación -->
+    <div id="modalEdicion" class="fixed inset-0 modal-bg hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-white p-6 rounded-xl shadow-2xl w-full max-w-lg border-t-8 border-green-500 max-h-[90vh] overflow-y-auto">
+            <h3 class="font-bold text-lg mb-4 text-green-600">Modificar Registro</h3>
+            <input type="hidden" id="editIndex">
+            <div id="camposEdicion" class="grid grid-cols-1 gap-3"></div>
+            <div class="flex gap-2 mt-6">
+                <button onclick="guardarEdicion()" class="flex-1 bg-green-600 text-white py-3 rounded font-bold hover:bg-green-700 shadow">Actualizar</button>
+                <button onclick="cerrarModal()" class="flex-1 bg-gray-300 text-gray-700 py-3 rounded font-bold hover:bg-gray-400">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Seleccionar Matrícula MT a Exportar -->
+    <div id="modalExportarMT" class="fixed inset-0 modal-bg hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-white p-6 rounded-xl shadow-2xl w-full max-w-md border-t-8 border-green-600">
+            <h3 class="font-bold text-lg mb-2 text-green-700">Seleccionar Matrícula MT a Exportar</h3>
+            <p class="text-xs text-gray-600 mb-4">Esta obra tiene varias Matrículas MT registradas. Selecciona cuál deseas exportar en el archivo de Excel:</p>
+            
+            <div class="mb-4">
+                <label class="block text-xs font-bold text-gray-700 mb-1">Matrícula MT</label>
+                <select id="selectMTEnd" class="w-full p-2 border rounded bg-white text-gray-900 text-sm font-bold">
+                    <!-- Opciones cargadas dinámicamente -->
+                </select>
+            </div>
+
+            <div class="flex gap-2">
+                <button onclick="ejecutarExportacionExcel()" class="flex-1 bg-green-600 text-white py-2.5 rounded font-bold hover:bg-green-700 text-xs shadow">Descargar Excel</button>
+                <button onclick="cerrarModalExportarMT()" class="flex-1 bg-gray-200 text-gray-800 py-2.5 rounded font-bold hover:bg-gray-300 text-xs">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- NUEVO: Modal de Opciones de Borrado -->
+    <div id="modalEliminarOpciones" class="fixed inset-0 modal-bg hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-white p-6 rounded-xl shadow-2xl w-full max-w-md border-t-8 border-red-500">
+            <h3 class="font-bold text-lg mb-2 text-red-600">¿Qué registros deseas eliminar?</h3>
+            <p class="text-xs text-gray-600 mb-4">Selecciona el alcance de los registros que quieres borrar permanentemente del sistema:</p>
+            
+            <div class="mb-4 space-y-3">
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">Modo de Borrado</label>
+                    <select id="tipoBorrado" class="w-full p-2 border rounded bg-white text-gray-900 text-sm font-bold" onchange="cambiarTipoBorrado()">
+                        <option value="obra">Borrar solo la Obra actual en pantalla</option>
+                        <option value="mt">Borrar una Matrícula MT específica de esta obra</option>
+                        <option value="todo">⚠️ Borrar TODO el sistema (Absolutamente todo)</option>
+                    </select>
+                </div>
+
+                <div id="contenedorSelectMTDel" class="hidden">
+                    <label class="block text-xs font-bold text-gray-700 mb-1">Selecciona la Matrícula MT a Borrar:</label>
+                    <select id="selectMTDel" class="w-full p-2 border rounded bg-white text-gray-900 text-sm font-bold">
+                        <!-- Opciones cargadas dinámicamente -->
+                    </select>
+                </div>
+            </div>
+
+            <div class="flex gap-2">
+                <button onclick="ejecutarBorradoSelectivo()" class="flex-1 bg-red-600 text-white py-2.5 rounded font-bold hover:bg-red-700 text-xs shadow">Confirmar Borrado</button>
+                <button onclick="cerrarModalEliminacion()" class="flex-1 bg-gray-200 text-gray-800 py-2.5 rounded font-bold hover:bg-gray-300 text-xs">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let amarres = JSON.parse(localStorage.getItem('amarres_data')) || [];
+        renderizar();
+
+        function soloNumeros(input) {
+            input.value = input.value.replace(/[^0-9]/g, '');
+        }
+
+        document.getElementById('amarreForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const trafo = document.getElementById('transformador').value.trim();
+            if(!trafo) {
+                alert("Por favor, ingresa la Obra o Proyecto.");
+                document.getElementById('transformador').focus();
+                return;
+            }
+
+            const nuevoNic = document.getElementById('nic').value.trim();
+            const nuevoNis = document.getElementById('nis').value.trim();
+            const nuevaSerie = document.getElementById('serieMedidor').value.trim();
+
+            if (nuevoNic !== '' && amarres.some(r => r.nic === nuevoNic)) {
+                alert(`⚠️ El NIC "${nuevoNic}" ya se encuentra registrado en el sistema.`);
+                document.getElementById('nic').focus();
+                return;
+            }
+            if (nuevoNis !== '' && amarres.some(r => r.nis === nuevoNis)) {
+                alert(`⚠️ El NIS "${nuevoNis}" ya se encuentra registrado en el sistema.`);
+                document.getElementById('nis').focus();
+                return;
+            }
+            if (nuevaSerie !== '' && amarres.some(r => r.serieMedidor === nuevaSerie)) {
+                alert(`⚠️ La Serie de Medidor "${nuevaSerie}" ya se encuentra registrada en el sistema.`);
+                document.getElementById('serieMedidor').focus();
+                return;
+            }
+
+            const campos = ['transformador','departamento','ciudad','barrio','delegacion','tipoProyecto','matriculaMT','tp','mac','tc','tipoPuntoMedida','tipoActividad','serieMedidor','tipoMedidor','marcaMedidor','nic','nis','nombreCliente','direccionCliente','obs'];
+            let item = {};
+            campos.forEach(c => item[c] = document.getElementById(c).value);
+            amarres.push(item);
+            localStorage.setItem('amarres_data', JSON.stringify(amarres));
+            renderizar();
+            
+            ['serieMedidor','nic','nis','nombreCliente','direccionCliente','obs','mac','barrio','matriculaMT'].forEach(c => {
+                const el = document.getElementById(c);
+                if(el) el.value = '';
+            });
+        });
+
+        function renderizar() {
+    const obraActual = document.getElementById('transformador').value.trim().toLowerCase();
+    const table = document.getElementById('tablaAmarres');
+    table.innerHTML = '';
+    
+    const filtrados = amarres.map((item, originalIndex) => ({ item, originalIndex }))
+                              .filter(({ item }) => !obraActual || (item.transformador && item.transformador.toLowerCase().includes(obraActual)));
+    
+    document.getElementById('contador').innerText = filtrados.length;
+
+    // --- NUEVO: Actualizar la lista de autocompletar obras ---
+    const obrasUnicas = [...new Set(amarres.map(item => item.transformador).filter(Boolean))];
+    const dataList = document.getElementById('listaObras');
+    dataList.innerHTML = '';
+    obrasUnicas.forEach(obra => {
+        dataList.innerHTML += `<option value="${obra}">`;
+    });
+    // ---------------------------------------------------------
+
+    if (filtrados.length === 0) {
+        table.innerHTML = `<tr><td colspan="2" class="text-center py-4 text-gray-400 text-xs">No hay registros para esta obra.</td></tr>`;
+        return;
+    }
+    
+    filtrados.forEach(({ item: r, originalIndex }) => {
+        table.innerHTML += `<tr class="border-b bg-white hover:bg-gray-100">
+            <td class="py-3 px-2">
+                <div class="font-bold text-sky-800">NIC: ${r.nic || 'S/N'} | Med: ${r.serieMedidor || 'S/N'}</div>
+                <div class="text-xs text-gray-500">${r.nombreCliente || 'Sin nombre'} (Obra: <b>${r.transformador}</b> | MT Inst: <b>${r.matriculaMT || 'N/A'}</b>)</div>
+            </td>
+            <td class="text-right whitespace-nowrap px-2">
+                <button onclick="abrirModal(${originalIndex})" class="text-sky-600 font-bold mr-3 hover:underline text-xs">Modificar</button>
+                <button onclick="eliminar(${originalIndex})" class="text-red-600 font-bold hover:underline text-xs">Eliminar</button>
+            </td>
+        </tr>`;
+    });
+}
+
+        // --- FUNCIONES DE MODAL DE ELIMINACIÓN ---
+        function prepararModalEliminacion() {
+            const obraActual = document.getElementById('transformador').value.trim().toLowerCase();
+            const filtrados = amarres.filter(item => !obraActual || (item.transformador && item.transformador.toLowerCase().includes(obraActual)));
+            
+            if (amarres.length === 0) {
+                alert("No hay registros en el sistema.");
+                return;
+            }
+
+            document.getElementById('tipoBorrado').value = 'obra';
+            cambiarTipoBorrado();
+
+            // Cargar MTs de la obra actual por si eligen filtrar por MT
+            const mtUnicas = [...new Set(filtrados.map(item => item.matriculaMT || 'SIN MATRICULA MT'))];
+            const selectMT = document.getElementById('selectMTDel');
+            selectMT.innerHTML = '';
+            mtUnicas.forEach(mt => {
+                selectMT.innerHTML += `<option value="${mt}">${mt}</option>`;
+            });
+
+            document.getElementById('modalEliminarOpciones').classList.remove('hidden');
+        }
+
+        function cambiarTipoBorrado() {
+            const tipo = document.getElementById('tipoBorrado').value;
+            const contenedorMT = document.getElementById('contenedorSelectMTDel');
+            if (tipo === 'mt') {
+                contenedorMT.classList.remove('hidden');
+            } else {
+                contenedorMT.classList.add('hidden');
+            }
+        }
+
+        function cerrarModalEliminacion() {
+            document.getElementById('modalEliminarOpciones').classList.add('hidden');
+        }
+
+        function ejecutarBorradoSelectivo() {
+            const tipo = document.getElementById('tipoBorrado').value;
+            const obraActual = document.getElementById('transformador').value.trim().toLowerCase();
+
+            if (tipo === 'todo') {
+                if (confirm('⚠️ ¿ESTÁS 100% SEGURO? Esto borrará TODOS los registros almacenados en el sistema.')) {
+                    amarres = [];
+                    localStorage.removeItem('amarres_data');
+                    renderizar();
+                    cerrarModalEliminacion();
+                }
+            } else if (tipo === 'obra') {
+                if (!obraActual) {
+                    alert("Por favor ingresa primero el nombre de la obra en el campo superior para identificarla.");
+                    cerrarModalEliminacion();
+                    return;
+                }
+                if (confirm(`⚠️ ¿Deseas borrar todos los registros asociados a la obra actual ("${document.getElementById('transformador').value.trim()}")?`)) {
+                    amarres = amarres.filter(item => !(item.transformador && item.transformador.toLowerCase().includes(obraActual)));
+                    localStorage.setItem('amarres_data', JSON.stringify(amarres));
+                    renderizar();
+                    cerrarModalEliminacion();
+                }
+            } else if (tipo === 'mt') {
+                const mtSeleccionada = document.getElementById('selectMTDel').value;
+                if (confirm(`⚠️ ¿Deseas borrar los registros de la Matrícula MT "${mtSeleccionada}" en esta obra?`)) {
+                    amarres = amarres.filter(item => {
+                        const coincideObra = !obraActual || (item.transformador && item.transformador.toLowerCase().includes(obraActual));
+                        if (!coincideObra) return true; // Se queda si es de otra obra
+                        
+                        const mtItem = item.matriculaMT || 'SIN MATRICULA MT';
+                        return mtItem !== mtSeleccionada; // Se borra si coincide con la MT seleccionada
+                    });
+                    localStorage.setItem('amarres_data', JSON.stringify(amarres));
+                    renderizar();
+                    cerrarModalEliminacion();
+                }
+            }
+        }
+        // -----------------------------------------
+
+        function abrirModal(i) {
+            const r = amarres[i];
+            document.getElementById('editIndex').value = i;
+            document.getElementById('camposEdicion').innerHTML = `
+                <div><label class="text-xs font-bold">Obra / Proyecto</label><input id="e_transformador" class="w-full p-2 border rounded bg-white text-gray-900 text-xs font-bold" value="${r.transformador || ''}"></div>
+                <div><label class="text-xs font-bold">Matrícula MT Instalada</label><input id="e_matriculaMT" class="w-full p-2 border rounded bg-white text-gray-900 text-xs font-bold" value="${r.matriculaMT || ''}"></div>
+                <div><label class="text-xs font-bold">Serie Medidor</label><input id="e_serieMedidor" inputmode="numeric" pattern="[0-9]*" oninput="soloNumeros(this)" class="w-full p-2 border rounded bg-white text-gray-900 text-xs" value="${r.serieMedidor || ''}"></div>
+                <div><label class="text-xs font-bold">Tipo Medidor</label><select id="e_tipoMedidor" class="w-full p-2 border rounded bg-white text-gray-900 text-xs"><option ${r.tipoMedidor === 'Monofasico Bifilar 1F2H' ? 'selected' : ''}>Monofasico Bifilar 1F2H</option><option ${r.tipoMedidor === 'Monofasico Trifilar 1F3H' ? 'selected' : ''}>Monofasico Trifilar 1F3H</option><option ${r.tipoMedidor === 'Bifasico 2F3H' ? 'selected' : ''}>Bifasico 2F3H</option></select></div>
+                <div><label class="text-xs font-bold">Marca</label><input id="e_marcaMedidor" class="w-full p-2 border rounded bg-white text-gray-900 text-xs" value="${r.marcaMedidor || ''}"></div>
+                <div><label class="text-xs font-bold">NIC</label><input id="e_nic" inputmode="numeric" pattern="[0-9]*" oninput="soloNumeros(this)" class="w-full border p-2 border rounded bg-white text-gray-900 text-xs" value="${r.nic || ''}"></div>
+                <div><label class="text-xs font-bold">NIS</label><input id="e_nis" inputmode="numeric" pattern="[0-9]*" oninput="soloNumeros(this)" class="w-full border p-2 border rounded bg-white text-gray-900 text-xs" value="${r.nis || ''}"></div>
+                <div><label class="text-xs font-bold">Nombre Cliente</label><input id="e_nombreCliente" class="w-full p-2 border rounded bg-white text-gray-900 text-xs" value="${r.nombreCliente || ''}"></div>
+                <div><label class="text-xs font-bold">Dirección</label><input id="e_direccionCliente" class="w-full p-2 border rounded bg-white text-gray-900 text-xs" value="${r.direccionCliente || ''}"></div>
+                <div><label class="text-xs font-bold">OBS</label><input id="e_obs" inputmode="numeric" pattern="[0-9]*" oninput="soloNumeros(this)" class="w-full border p-2 border rounded bg-white text-gray-900 text-xs" value="${r.obs || ''}"></div>
+            `;
+            document.getElementById('modalEdicion').classList.remove('hidden');
+        }
+
+        function cerrarModal() { document.getElementById('modalEdicion').classList.add('hidden'); }
+
+        function guardarEdicion() {
+            const i = document.getElementById('editIndex').value;
+            amarres[i].transformador = document.getElementById('e_transformador').value;
+            amarres[i].matriculaMT = document.getElementById('e_matriculaMT').value;
+            amarres[i].serieMedidor = document.getElementById('e_serieMedidor').value;
+            amarres[i].tipoMedidor = document.getElementById('e_tipoMedidor').value;
+            amarres[i].marcaMedidor = document.getElementById('e_marcaMedidor').value;
+            amarres[i].nic = document.getElementById('e_nic').value;
+            amarres[i].nis = document.getElementById('e_nis').value;
+            amarres[i].nombreCliente = document.getElementById('e_nombreCliente').value;
+            amarres[i].direccionCliente = document.getElementById('e_direccionCliente').value;
+            amarres[i].obs = document.getElementById('e_obs').value;
+            localStorage.setItem('amarres_data', JSON.stringify(amarres));
+            renderizar();
+            cerrarModal();
+        }
+
+        function eliminar(i) {
+            if(confirm('¿Borrar este registro individual?')) {
+                amarres.splice(i, 1);
+                localStorage.setItem('amarres_data', JSON.stringify(amarres));
+                renderizar();
+            }
+        }
+
+        function prepararExportacion() {
+            const obraActual = document.getElementById('transformador').value.trim().toLowerCase();
+            const filtrados = amarres.filter(item => !obraActual || (item.transformador && item.transformador.toLowerCase().includes(obraActual)));
+            if (filtrados.length === 0) { alert("No hay registros para exportar."); return; }
+            
+            const mtUnicas = [...new Set(filtrados.map(item => item.matriculaMT || 'SIN MATRICULA MT'))];
+            
+            const select = document.getElementById('selectMTEnd');
+            select.innerHTML = '<option value="TODAS">-- Todas las Matrículas MT de la Obra --</option>';
+            
+            mtUnicas.forEach(mt => {
+                select.innerHTML += `<option value="${mt}">${mt}</option>`;
+            });
+
+            document.getElementById('modalExportarMT').classList.remove('hidden');
+        }
+
+        function cerrarModalExportarMT() {
+            document.getElementById('modalExportarMT').classList.add('hidden');
+        }
+
+        function ejecutarExportacionExcel() {
+            const obraActual = document.getElementById('transformador').value.trim().toLowerCase();
+            const mtSeleccionada = document.getElementById('selectMTEnd').value;
+            
+            const filtrados = amarres.filter(item => {
+                const coincideObra = !obraActual || (item.transformador && item.transformador.toLowerCase().includes(obraActual));
+                if (!coincideObra) return false;
+                
+                if (mtSeleccionada === 'TODAS') return true;
+                const mtItem = item.matriculaMT || 'SIN MATRICULA MT';
+                return mtItem === mtSeleccionada;
+            });
+
+            if (filtrados.length === 0) { alert("No hay registros para esta selección."); return; }
+
+            const datosExportar = filtrados.map((item, idx) => ({ "#": idx + 1, ...item }));
+            const worksheet = XLSX.utils.json_to_sheet(datosExportar);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Amarres");
+            
+            const nombreObra = document.getElementById('transformador').value.trim() || 'General';
+            const sufijoMT = mtSeleccionada === 'TODAS' ? 'Todas_MT' : mtSeleccionada.replace(/[^a-zA-Z0-9]/g, '_');
+            
+            cerrarModalExportarMT();
+            XLSX.writeFile(workbook, `Reporte_${nombreObra}_${sufijoMT}.xlsx`, { bookType: 'xlsx', type: 'binary' });
+        }
+    </script>
+</body>
+</html>
