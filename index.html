@@ -25,7 +25,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
                     <div class="md:col-span-2 bg-yellow-100 p-2 rounded border border-yellow-300">
                         <label class="block text-[11px] font-extrabold text-yellow-900">Obra / Proyecto</label>
-                        <input type="text" id="transformador" placeholder="Ej: Obra La Candelaria" class="w-full border p-1 rounded text-xs bg-white text-gray-900 font-bold" oninput="verificarCambioObra()" onchange="guardarFijos()" list="listaObras">
+                        <input type="text" id="transformador" placeholder="Ej: Obra La Candelaria" class="w-full border p-1 rounded text-xs bg-white text-gray-900 font-bold" oninput="verificarCambioObra()" onchange="verificarCambioObra(); guardarFijos();" list="listaObras">
                         <datalist id="listaObras"></datalist>
                     </div>
                     <div><label class="block text-[10px] font-bold text-sky-900">Departamento</label><input type="text" id="departamento" value="Bolívar" class="w-full border p-1 rounded text-xs bg-white text-gray-900" onchange="guardarFijos()"></div>
@@ -368,7 +368,7 @@
                 "TP": item.tp || '',
                 "MAC": item.mac || '',
                 "TC": item.tc || '',
-                "Tipo Punto Medida": item.tipoPunto Medida || '',
+                "Tipo Punto Medida": item.tipoPuntoMedida || '',
                 "Tipo Actividad": item.tipoActividad || '',
                 "Serie Medidor": item.serieMedidor || '',
                 "Tipo Medidor": item.tipoMedidor || '',
