@@ -25,7 +25,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
                     <div class="md:col-span-2 bg-yellow-100 p-2 rounded border border-yellow-300">
                         <label class="block text-[11px] font-extrabold text-yellow-900">Obra / Proyecto</label>
-                        <input type="text" id="transformador" placeholder="Ej: Obra La Candelaria" class="w-full border p-1 rounded text-xs bg-white text-gray-900 font-bold" onchange="guardarFijos()" list="listaObras">
+                        <input type="text" id="transformador" placeholder="Ej: Obra La Candelaria" class="w-full border p-1 rounded text-xs bg-white text-gray-900 font-bold" oninput="verificarCambioObra()" onchange="guardarFijos()" list="listaObras">
                         <datalist id="listaObras"></datalist>
                     </div>
                     <div><label class="block text-[10px] font-bold text-sky-900">Departamento</label><input type="text" id="departamento" value="Bolívar" class="w-full border p-1 rounded text-xs bg-white text-gray-900" onchange="guardarFijos()"></div>
@@ -131,8 +131,8 @@
 
     <script>
         let amarres = JSON.parse(localStorage.getItem('amarres_data')) || [];
+        let obraAnterior = "";
         
-        // Cargar campos fijos guardados previamente si existen
         window.addEventListener('DOMContentLoaded', () => {
             const fijosGuardados = JSON.parse(localStorage.getItem('amarres_fijos')) || {};
             const camposFijos = ['transformador','departamento','ciudad','barrio','delegacion','tipoProyecto','matriculaMT','tp','mac','tc','tipoPuntoMedida','tipoActividad'];
@@ -141,8 +141,24 @@
                     document.getElementById(c).value = fijosGuardados[c];
                 }
             });
+            obraAnterior = document.getElementById('transformador').value.trim();
             renderizar();
         });
+
+        function verificarCambioObra() {
+            const obraActual = document.getElementById('transformador').value.trim();
+            if (obraActual !== obraAnterior) {
+                // Limpiar campos específicos al cambiar de obra
+                document.getElementById('barrio').value = '';
+                document.getElementById('matriculaMT').value = '';
+                document.getElementById('mac').value = '';
+                document.getElementById('tp').value = '';
+                document.getElementById('tc').value = '';
+                
+                obraAnterior = obraActual;
+                guardarFijos();
+            }
+        }
 
         function guardarFijos() {
             const camposFijos = ['transformador','departamento','ciudad','barrio','delegacion','tipoProyecto','matriculaMT','tp','mac','tc','tipoPuntoMedida','tipoActividad'];
@@ -191,7 +207,6 @@
             localStorage.setItem('amarres_data', JSON.stringify(amarres));
             renderizar();
             
-            // Limpia únicamente los datos del usuario, conservando intactos todos los datos fijos
             const camposUsuario = ['serieMedidor', 'nic', 'nis', 'nombreCliente', 'direccionCliente', 'obs'];
             camposUsuario.forEach(c => document.getElementById(c).value = '');
             document.getElementById('serieMedidor').focus();
@@ -353,7 +368,7 @@
                 "TP": item.tp || '',
                 "MAC": item.mac || '',
                 "TC": item.tc || '',
-                "Tipo Punto Medida": item.tipoPuntoMedida || '',
+                "Tipo Punto Medida": item.tipoPunto Medida || '',
                 "Tipo Actividad": item.tipoActividad || '',
                 "Serie Medidor": item.serieMedidor || '',
                 "Tipo Medidor": item.tipoMedidor || '',
