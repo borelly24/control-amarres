@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registro de Amarres - Pro</title>
+    <!-- Icono para pestaña del navegador y acceso directo en dispositivos móviles -->
+    <link rel="icon" href="icono.png" type="image/png">
+    <link rel="apple-touch-icon" href="icono.png">
+    <link rel="manifest" href='data:application/manifest+json,{"name":"Registro de Amarres","short_name":"Amarres","start_url":"./","display":"standalone","background_color":"%23ffffff","icons":[{"src":"icono.png","sizes":"192x192","type":"image/png"}]}'>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
@@ -201,7 +205,7 @@
             table.innerHTML = '';
             
             const filtrados = amarres.map((item, originalIndex) => ({ item, originalIndex }))
-                                      .filter(({ item }) => !obraActual || (item.transformador && item.transformador.toLowerCase().includes(obraActual)));
+                                    .filter(({ item }) => !obraActual || (item.transformador && item.transformador.toLowerCase().includes(obraActual)));
             
             document.getElementById('contador').innerText = filtrados.length;
 
