@@ -22,7 +22,8 @@
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
                     <div class="md:col-span-2 bg-yellow-100 p-2 rounded border border-yellow-300">
                         <label class="block text-[11px] font-extrabold text-yellow-900">Obra / Proyecto (Filtro)</label>
-                        <input type="text" id="transformador" placeholder="Ej: Obra La Candelaria o Código" required class="w-full border p-1 rounded text-xs bg-white text-gray-900 font-bold" oninput="renderizar()">
+                        <input type="text" id="transformador" placeholder="Ej: Obra La Candelaria o Código" required class="w-full border p-1 rounded text-xs bg-white text-gray-900 font-bold" oninput="renderizar()" list="listaObras">
+                        <datalist id="listaObras"></datalist>
                     </div>
                     <div><label class="block text-[10px] font-bold text-sky-900">Departamento</label><input type="text" id="departamento" value="Bolívar" class="w-full border p-1 rounded text-xs bg-white text-gray-900"></div>
                     <div><label class="block text-[10px] font-bold text-sky-900">Ciudad</label><input type="text" id="ciudad" value="Magangué" class="w-full border p-1 rounded text-xs bg-white text-gray-900"></div>
@@ -113,7 +114,7 @@
         </div>
     </div>
 
-    <!-- NUEVO: Modal de Opciones de Borrado -->
+    <!-- Modal de Opciones de Borrado -->
     <div id="modalEliminarOpciones" class="fixed inset-0 modal-bg hidden flex items-center justify-center p-4 z-50">
         <div class="bg-white p-6 rounded-xl shadow-2xl w-full max-w-md border-t-8 border-red-500">
             <h3 class="font-bold text-lg mb-2 text-red-600">¿Qué registros deseas eliminar?</h3>
@@ -198,13 +199,24 @@
             const obraActual = document.getElementById('transformador').value.trim().toLowerCase();
             const table = document.getElementById('tablaAmarres');
             table.innerHTML = '';
+            
             const filtrados = amarres.map((item, originalIndex) => ({ item, originalIndex }))
-                                     .filter(({ item }) => !obraActual || (item.transformador && item.transformador.toLowerCase().includes(obraActual)));
+                                      .filter(({ item }) => !obraActual || (item.transformador && item.transformador.toLowerCase().includes(obraActual)));
+            
             document.getElementById('contador').innerText = filtrados.length;
+
+            const obrasUnicas = [...new Set(amarres.map(item => item.transformador).filter(Boolean))];
+            const dataList = document.getElementById('listaObras');
+            dataList.innerHTML = '';
+            obrasUnicas.forEach(obra => {
+                dataList.innerHTML += `<option value="${obra}">`;
+            });
+
             if (filtrados.length === 0) {
                 table.innerHTML = `<tr><td colspan="2" class="text-center py-4 text-gray-400 text-xs">No hay registros para esta obra.</td></tr>`;
                 return;
             }
+            
             filtrados.forEach(({ item: r, originalIndex }) => {
                 table.innerHTML += `<tr class="border-b bg-white hover:bg-gray-100">
                     <td class="py-3 px-2">
@@ -219,7 +231,6 @@
             });
         }
 
-        // --- FUNCIONES DE MODAL DE ELIMINACIÓN ---
         function prepararModalEliminacion() {
             const obraActual = document.getElementById('transformador').value.trim().toLowerCase();
             const filtrados = amarres.filter(item => !obraActual || (item.transformador && item.transformador.toLowerCase().includes(obraActual)));
@@ -232,7 +243,6 @@
             document.getElementById('tipoBorrado').value = 'obra';
             cambiarTipoBorrado();
 
-            // Cargar MTs de la obra actual por si eligen filtrar por MT
             const mtUnicas = [...new Set(filtrados.map(item => item.matriculaMT || 'SIN MATRICULA MT'))];
             const selectMT = document.getElementById('selectMTDel');
             selectMT.innerHTML = '';
@@ -285,10 +295,10 @@
                 if (confirm(`⚠️ ¿Deseas borrar los registros de la Matrícula MT "${mtSeleccionada}" en esta obra?`)) {
                     amarres = amarres.filter(item => {
                         const coincideObra = !obraActual || (item.transformador && item.transformador.toLowerCase().includes(obraActual));
-                        if (!coincideObra) return true; // Se queda si es de otra obra
+                        if (!coincideObra) return true;
                         
                         const mtItem = item.matriculaMT || 'SIN MATRICULA MT';
-                        return mtItem !== mtSeleccionada; // Se borra si coincide con la MT seleccionada
+                        return mtItem !== mtSeleccionada;
                     });
                     localStorage.setItem('amarres_data', JSON.stringify(amarres));
                     renderizar();
@@ -296,7 +306,6 @@
                 }
             }
         }
-        // -----------------------------------------
 
         function abrirModal(i) {
             const r = amarres[i];
@@ -307,11 +316,11 @@
                 <div><label class="text-xs font-bold">Serie Medidor</label><input id="e_serieMedidor" inputmode="numeric" pattern="[0-9]*" oninput="soloNumeros(this)" class="w-full p-2 border rounded bg-white text-gray-900 text-xs" value="${r.serieMedidor || ''}"></div>
                 <div><label class="text-xs font-bold">Tipo Medidor</label><select id="e_tipoMedidor" class="w-full p-2 border rounded bg-white text-gray-900 text-xs"><option ${r.tipoMedidor === 'Monofasico Bifilar 1F2H' ? 'selected' : ''}>Monofasico Bifilar 1F2H</option><option ${r.tipoMedidor === 'Monofasico Trifilar 1F3H' ? 'selected' : ''}>Monofasico Trifilar 1F3H</option><option ${r.tipoMedidor === 'Bifasico 2F3H' ? 'selected' : ''}>Bifasico 2F3H</option></select></div>
                 <div><label class="text-xs font-bold">Marca</label><input id="e_marcaMedidor" class="w-full p-2 border rounded bg-white text-gray-900 text-xs" value="${r.marcaMedidor || ''}"></div>
-                <div><label class="text-xs font-bold">NIC</label><input id="e_nic" inputmode="numeric" pattern="[0-9]*" oninput="soloNumeros(this)" class="w-full border p-2 border rounded bg-white text-gray-900 text-xs" value="${r.nic || ''}"></div>
-                <div><label class="text-xs font-bold">NIS</label><input id="e_nis" inputmode="numeric" pattern="[0-9]*" oninput="soloNumeros(this)" class="w-full border p-2 border rounded bg-white text-gray-900 text-xs" value="${r.nis || ''}"></div>
+                <div><label class="text-xs font-bold">NIC</label><input id="e_nic" inputmode="numeric" pattern="[0-9]*" oninput="soloNumeros(this)" class="w-full p-2 border rounded bg-white text-gray-900 text-xs" value="${r.nic || ''}"></div>
+                <div><label class="text-xs font-bold">NIS</label><input id="e_nis" inputmode="numeric" pattern="[0-9]*" oninput="soloNumeros(this)" class="w-full p-2 border rounded bg-white text-gray-900 text-xs" value="${r.nis || ''}"></div>
                 <div><label class="text-xs font-bold">Nombre Cliente</label><input id="e_nombreCliente" class="w-full p-2 border rounded bg-white text-gray-900 text-xs" value="${r.nombreCliente || ''}"></div>
                 <div><label class="text-xs font-bold">Dirección</label><input id="e_direccionCliente" class="w-full p-2 border rounded bg-white text-gray-900 text-xs" value="${r.direccionCliente || ''}"></div>
-                <div><label class="text-xs font-bold">OBS</label><input id="e_obs" inputmode="numeric" pattern="[0-9]*" oninput="soloNumeros(this)" class="w-full border p-2 border rounded bg-white text-gray-900 text-xs" value="${r.obs || ''}"></div>
+                <div><label class="text-xs font-bold">OBS</label><input id="e_obs" inputmode="numeric" pattern="[0-9]*" oninput="soloNumeros(this)" class="w-full p-2 border rounded bg-white text-gray-900 text-xs" value="${r.obs || ''}"></div>
             `;
             document.getElementById('modalEdicion').classList.remove('hidden');
         }
