@@ -193,8 +193,9 @@
             localStorage.setItem('amarres_data', JSON.stringify(amarres));
             renderizar();
             
-            // Limpieza de campos específicos de usuario y datos técnicos variables por registro
-            ['barrio', 'matriculaMT', 'mac', 'serieMedidor', 'nic', 'nis', 'nombreCliente', 'direccionCliente', 'obs'].forEach(c => {
+            // Se limpian ÚNICAMENTE los datos específicos del usuario/medidor. 
+            // Los campos fijos (Obra, Barrio, Matrícula MT, MAC, etc.) se conservan para el siguiente registro.
+            ['serieMedidor', 'nic', 'nis', 'nombreCliente', 'direccionCliente', 'obs'].forEach(c => {
                 const el = document.getElementById(c);
                 if(el) el.value = '';
             });
@@ -365,7 +366,7 @@
             const mtUnicas = [...new Set(filtrados.map(item => item.matriculaMT || 'SIN MATRICULA MT'))];
             
             const select = document.getElementById('selectMTEnd');
-            select.innerHTML = '<option value="TODAS">-- Todas las Matrículas MT de la Obra --</option>';
+            select.innerHTML = '<option value="TODAS">-- Toutes les Matrículas MT de la Obra --</option>';
             
             mtUnicas.forEach(mt => {
                 select.innerHTML += `<option value="${mt}">${mt}</option>`;
